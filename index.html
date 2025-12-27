@@ -1,0 +1,122 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Information Database</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            width: 80%;
+            margin: 40px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+        input[type="password"], input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #3e8e41;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Information Database</h2>
+        <button onclick="showUploadForm()">Upload Information</button>
+        <button onclick="showRetrieveForm()">Retrieve Information</button>
+        <div id="upload-form" style="display: none;">
+            <h3>Upload Information</h3>
+            <label for="password">Password:</label>
+            <input type="password" id="password" />
+            <label for="heading">Information Heading:</label>
+            <input type="text" id="heading" />
+            <label for="information">Information:</label>
+            <textarea id="information"></textarea>
+            <button onclick="uploadInformation()">Upload</button>
+            <p id="upload-message"></p>
+        </div>
+        <div id="retrieve-form" style="display: none;">
+            <h3>Retrieve Information</h3>
+            <label for="retrieve-heading">Information Heading:</label>
+            <input type="text" id="retrieve-heading" />
+            <button onclick="retrieveInformation()">Retrieve</button>
+            <p id="retrieve-message"></p>
+            <div id="retrieved-information"></div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script>
+        const password = "emalawi19";
+
+        function showUploadForm() {
+            document.getElementById("upload-form").style.display = "block";
+            document.getElementById("retrieve-form").style.display = "none";
+        }
+
+        function showRetrieveForm() {
+            document.getElementById("upload-form").style.display = "none";
+            document.getElementById("retrieve-form").style.display = "block";
+        }
+
+        function uploadInformation() {
+            const inputPassword = document.getElementById("password").value;
+            const heading = document.getElementById("heading").value;
+            const information = document.getElementById("information").value;
+
+            if (inputPassword === password) {
+                const file = new Blob([information], {type: "text/plain"});
+                saveAs(file, `${heading}.txt`);
+                document.getElementById("upload-message").innerText = "Information uploaded successfully!";
+                document.getElementById("password").value = "";
+                document.getElementById("heading").value = "";
+                document.getElementById("information").value = "";
+            } else {
+                document.getElementById("upload-message").innerText = "Incorrect password!";
+            }
+        }
+
+        function retrieveInformation() {
+            const heading = document.getElementById("retrieve-heading").value;
+            const fileInput = document.createElement("input");
+            fileInput.type = "file";
+            fileInput.accept = ".txt";
+            fileInput.onchange = function(event) {
+                const file = event.target.files[0];
+                if (file.name === `${heading}.txt`) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        document.getElementById("retrieve-message").innerText = "";
+                        document.getElementById("retrieved-information").innerText = event.target.result;
+                    };
+                    reader.readAsText(file);
+                } else {
+                    document.getElementById("retrieve-message").innerText = "File not found!";
+                    document.getElementById("retrieved-information").innerText = "";
+                }
+            };
+            fileInput.click();
+        }
+    </script>
+</body>
+</html>
